@@ -1,8 +1,8 @@
-## js-fetcher
+# js-fetcher
 
 A simple fetcher class to better window.fetch interface
 
-## Installation
+### Installation
 ```bash
 npm install --save @docomodigital/js-fetcher
 ```
