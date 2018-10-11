@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>utils/index.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Fetcher.html">Fetcher</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#head">head</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#normalizeURL">normalizeURL</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#performFetch">performFetch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#refreshToken">refreshToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#setTokenGenerator">setTokenGenerator</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="TokenGenerator.html">TokenGenerator</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="TokenGenerator.html#generate">generate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="TokenGenerator.html#isExpired">isExpired</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#compose">compose</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#isAbsoluteUrl">isAbsoluteUrl</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#parseResponse">parseResponse</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">utils/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import URLSearchParams from 'url-search-params';
+
+/**
+ * @description Parse the fetch response (call the response json function)
+ * @param {Object} res
+ * @return {Promise&lt;any>}
+ */
+export function parseResponse(res) {
+    return res.json();
+}
+
+/**
+ * @description Check if the given string is an absolute url (starts with http(s))
+ * @param {String} str
+ * @return {boolean}
+ * @example
+ * isAbsoluteUrl('http://endpoint.com/api/users') // true
+ * isAbsoluteUrl('/api/users') // false
+ */
+export function isAbsoluteUrl(str) {
+    const regex = /(https?)?:?\/\//g;
+    return regex.test(str);
+}
+
+/**
+ * @description Append the given query params object to the given url as queryparams
+ * @param {string} url
+ * @param {Object} queryParams
+ * @return {String}
+ * @example
+ * compose('http://endpoint.com/api/users', {page: 1, limit: 10}); // http://endpoint.com/api/users?page=1&amp;limit=10
+ */
+export function compose(url, queryParams) {
+    const splittedUrl = url.split('?');
+    const endpoint = splittedUrl[0];
+    const params = splittedUrl.length > 0 ? splittedUrl[1] : '';
+    const urlSearchParams = new URLSearchParams(params);
+
+    Object.keys(queryParams).forEach((key) => {
+        urlSearchParams.set(key, queryParams[key]);
+    });
+
+    return `${endpoint}?${urlSearchParams.toString()}`;
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 11 2018 15:55:21 GMT+0200 (CEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

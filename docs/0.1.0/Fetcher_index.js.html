@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Fetcher/index.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Fetcher.html">Fetcher</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#delete">delete</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#get">get</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#head">head</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#normalizeURL">normalizeURL</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#performFetch">performFetch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#post">post</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#put">put</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#refreshToken">refreshToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Fetcher.html#setTokenGenerator">setTokenGenerator</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="TokenGenerator.html">TokenGenerator</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="TokenGenerator.html#generate">generate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="TokenGenerator.html#isExpired">isExpired</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#compose">compose</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#isAbsoluteUrl">isAbsoluteUrl</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#parseResponse">parseResponse</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Fetcher/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global fetch */
+import { isAbsoluteUrl, parseResponse, compose } from '../utils/index';
+
+/**
+ * @description A simple fetcher class to better window.fetch interface
+ * @example
+ * const apiFetcher = new Fetcher({
+ *     baseURL: 'http://api.com/api/v1',
+ *     options: {
+ *         headers: {
+ *             'Content-Type': 'application/x-www-form-urlencoded',
+ *         }
+ *     }
+ * });
+ * // set an Authorization header for all requests
+ * apiFetcher.options.headers['Authorization'] = 'Bearer &lt;TOKEN>';
+ * apiFetcher.get('/v01/users').then(res => res.json());
+ * apiFetcher.post('/v01/user', {}, { credentials: 'include', body: JSON.stringify(asd) });
+ */
+class Fetcher {
+    /**
+     * @description Creates an instance of Fetcher.
+     * @param {Object} [options = {}]
+     * @param {String} [options.baseURL = window.location.origin]
+     * The baseURL to prepend to the given relative paths
+     * @param {Object} [options.options = {}] the options same as fetch spec
+     * @param {TokenGenerator} [tokenGenerator=null] - the token generator instance
+     */
+    constructor({ baseURL = window.location.origin, options = {} } = {}, tokenGenerator = null) {
+        this.baseURL = baseURL;
+        this.options = options;
+        this.tokenGenerator = tokenGenerator;
+        this.normalizeURL = this.normalizeURL.bind(this);
+        this.refreshToken = this.refreshToken.bind(this);
+    }
+
+    /**
+     * @description set the token generator after initialization
+     * token generator must have a .generate&lt;Promise> method
+     * @param {TokenGenerator} [tokenGenerator=null]
+     * @example
+     * const fetcher = new Fetcher();
+     * const generator = new TokenGenerator();
+     * fetcher.setTokenGenerator(generator);
+     */
+    setTokenGenerator(tokenGenerator = null) {
+        if (tokenGenerator &amp;&amp; typeof tokenGenerator.generate === 'function') {
+            this.tokenGenerator = tokenGenerator;
+        } else {
+            this.tokenGenerator = null;
+        }
+    }
+
+    /**
+     * @description add the baseUrl if the passed url is not absolute
+     * @param {any} url
+     * @return {String}
+     */
+    normalizeURL(url) {
+        if (!url) { throw new Error('Not valid url given'); }
+        return isAbsoluteUrl(url) ? url : this.baseURL + url;
+    }
+
+    /**
+     * @description called by the Fetcher Api,
+     * perform the real fetch request based on the given arguments.
+     * Avoid to use it directly to prevent unexpected behaviour
+     * @param {String} url - absolute or relative url
+     * @param {Object} params - params to append in querystring
+     * @param {Object} options - the options same as fetch spec
+     * @param {String} method - the request method
+     * @param {boolean} [parse = true] - if the response should be a raw http response or be parsed
+     * @return {PromiseLike&lt;T | never>}
+     */
+    performFetch(url, params, options, method, parse = true) {
+        const refreshTokenTask = this.refreshToken();
+        return refreshTokenTask.then(() => fetch(
+            this.normalizeURL(compose(url, params)),
+            Object.assign({}, this.options, options, { method })
+        )).then(res => parse ? parseResponse(res) : res); // eslint-disable-line no-confusing-arrow
+    }
+
+    /**
+     * @description perform a GET request
+     * @param {String} url - absolute or relative url
+     * @param {Object} [params={}] - params to append in querystring
+     * @param {Object} [options={}] - the options same as fetch spec
+     * @param {boolean} [parse = true] - if the response should be a raw http response or be parsed
+     * @return {PromiseLike&lt;T|never>}
+     * @example
+     * fetcher.get('/api/v1/users', {page: 1, limit: 10})
+     *     .then(users => {
+     *         // Do something with the json result...
+     *     });
+     */
+    get(url, params = {}, options = {}, parse = true) {
+        return this.performFetch(url, params, options, 'GET', parse);
+    }
+
+    /**
+     * @description Perform a POST request
+     * @param {String} url - absolute or relative url
+     * @param {Object} [params={}] - params to append in querystring
+     * @param {Object} [options={}] - the options same as fetch spec
+     * @param {boolean} [parse = true] - if the response should be a raw http response or be parsed
+     * @return {PromiseLike&lt;T|never>}
+     * @example
+     * fetcher.post('/api/v1/users', {}, {
+     *     body: JSON.stringify({name: 'foo', email: 'foo@bar.baz'
+     * })}).then(res => {
+     *   // Do something with the json result...
+     * });
+     */
+    post(url, params = {}, options = {}, parse = true) {
+        return this.performFetch(url, params, options, 'POST', parse);
+    }
+
+    /**
+     * @description Perform an HEAD request
+     * @param {String} url - absolute or relative url
+     * @param {Object} [params={}] - params to append in querystring
+     * @param {Object} [options={}] - the options same as fetch spec
+     * @param {boolean} [parse = true] - if the response should be a raw http response or be parsed
+     * @return {PromiseLike&lt;T|never>}
+     * @example
+     * fetcher.head('/api/v1/users')
+     *     .then(res => {
+     *         // Do something with the json result...
+     *     });
+     */
+    head(url, params = {}, options = {}, parse = true) {
+        return this.performFetch(url, params, options, 'HEAD', parse);
+    }
+
+    /**
+     * @description Perform a PUT request
+     * @param {String} url - absolute or relative url
+     * @param {Object} [params={}] - params to append in querystring
+     * @param {Object} [options={}] - the options same as fetch spec
+     * @param {boolean} [parse = true] - if the response should be a raw http response or be parsed
+     * @return {PromiseLike&lt;T|never>}
+     * @example
+     * fetcher.put('/api/v1/users/1', {}, {name: 'foo'})
+     *     .then(res => {
+     *         // Do something with the json result...
+     *     });
+     */
+    put(url, params = {}, options = {}, parse = true) {
+        return this.performFetch(url, params, options, 'PUT', parse);
+    }
+
+    /**
+     * @description Perform a DELETE request
+     * @param {String} url - absolute or relative url
+     * @param {Object} [params={}] - params to append in querystring
+     * @param {Object} [options={}] - the options same as fetch spec
+     * @param {boolean} [parse = true] - if the response should be a raw http response or be parsed
+     * @return {PromiseLike&lt;T|never>}
+     * @example
+     * fetcher.delete('/api/v1/users/1')
+     *     .then(res => {
+     *         // Do something with the json result...
+     *     });
+     */
+    delete(url, params = {}, options = {}, parse = true) {
+        return this.performFetch(url, params, options, 'DELETE', parse);
+    }
+
+    /**
+     * @description Call the TokenGenerator (if present) to get the Authorization token
+     * and set it in the Headers
+     * @return {*}
+     */
+    refreshToken() {
+        /* eslint-disable dot-notation */
+        if (!this.tokenGenerator) { return Promise.resolve(); }
+        return this.tokenGenerator.generate().then((token) => {
+            if (!token) {
+                delete this.options.headers['Authorization'];
+            } else {
+                this.options.headers['Authorization'] = `Bearer ${token}`;
+            }
+        }).catch(() => {
+            delete this.options.headers['Authorization'];
+            return Promise.resolve();
+        });
+        /* eslint-enable dot-notation */
+    }
+}
+
+export default Fetcher;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 11 2018 15:55:21 GMT+0200 (CEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
