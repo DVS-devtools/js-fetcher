@@ -1,8 +1,17 @@
-## @docomodigital/js-fetcher
+## js-fetcher
 
 A simple fetcher class to better window.fetch interface
 
-### Example
+## Installation
+```bash
+npm install --save @docomodigital/js-fetcher
+```
+Or
+```bash
+yarn add @docomodigital/js-fetcher
+```
+
+### Usage
 ```javascript
 import Fetcher from '@docomodigital/js-fetcher';
 
