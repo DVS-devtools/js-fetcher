@@ -1,4 +1,4 @@
-## js-fetcher
+## @docomodigital/js-fetcher
 
 A simple fetcher class to better window.fetch interface
 
