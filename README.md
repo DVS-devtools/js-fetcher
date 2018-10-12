@@ -2,16 +2,7 @@
 
 A simple fetcher class to better window.fetch interface
 
-### Installation
-```bash
-npm install --save @docomodigital/js-fetcher
-```
-Or
-```bash
-yarn add @docomodigital/js-fetcher
-```
-
-### Usage
+## Usage
 ```javascript
 import Fetcher from '@docomodigital/js-fetcher';
 
@@ -29,63 +20,21 @@ const fetcher = new Fetcher({
  fetcher.post('/v01/user', {}, { credentials: 'include', body: JSON.stringify({foo: 'bar'}) });
 ```
 
-### Api
 
-#### setTokenGenerator(tokenGenerator: TokenGenerator)
-Add a tokenGenerator class to generate the Auth token.
-It must have the `generate` method that returns a Promise with the valid token
-```javascript
-import { TokenGenerator } from '@docomodigital/js-fetcher';
-const tokenGenerator = new TokenGenerator({
-    url: 'http://api.com/api/auth/refresh',
-    clientId: 1,
-    clientSecret: 'secret'
-});
-fetcher.setTokenGenerator(tokenGenerator);
-``` 
+## Installation
 
-#### get(url: string, params: any = {}, body: any = {}, parse: boolean = true)
-Perform a GET request
-```javascript
-fetcher.get('/api/v1/users', {page: 1, limit: 10})
-    .then(users => {
-        // Do something with the json result...
-    });
+### NPM
+```bash
+npm install --save @docomodigital/js-fetcher
 ```
 
-#### post(url: string, params: any = {}, body: any = {}, parse: boolean = true)
-Perform a POST request
-```javascript
-fetcher.post('/api/v1/users', {}, { 
-    body: JSON.stringify({name: 'foo', email: 'foo@bar.baz' })
-}).then(res => {
-     // Do something with the json result...
-});
-```
+## Documentation
 
-#### head(url: string, params: any = {}, body: any = {}, parse: boolean = true)
-Perform an HEAD request
-```javascript
-fetcher.head('/api/v1/users')
-    .then(res => {
-        // Do something with the json result...
-    });
-```
+To read documentation, go to:
 
-#### put(url: string, params: any = {}, body: any = {}, parse: boolean = true)
-Perform a PUT request
-```javascript
-fetcher.put('/api/v1/users/1', {}, {name: 'foo'})
-    .then(res => {
-        // Do something with the json result...
-    });
-```
+[http://docomodigital.github.io/js-fetcher/latest](http://docomodigital.github.io/js-fetcher/latest)
 
-#### delete(url: string, params: any = {}, body: any = {}, parse: boolean = true)
-Perform a DELETE request
-```javascript
-fetcher.delete('/api/v1/users/1')
-    .then(res => {
-        // Do something with the json result...
-    });
+or run the following command inside the js-fetcher folder: 
+```bash
+npm run doc:open
 ```
