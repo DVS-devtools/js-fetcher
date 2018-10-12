@@ -1,5 +1,7 @@
 # js-fetcher
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/docomodigital/js-fetcher.svg)](https://greenkeeper.io/)
+
 A simple fetcher class to better window.fetch interface
 
 ## Usage
