@@ -1,6 +1,11 @@
 # js-fetcher
 
-A simple fetcher class to better window.fetch interface
+[![Build Status](https://travis-ci.com/docomodigital/js-fetcher.svg?branch=master)](https://travis-ci.com/docomodigital/js-fetcher)
+[![Coverage Status](https://coveralls.io/repos/github/docomodigital/js-fetcher/badge.svg?branch=master)](https://coveralls.io/github/docomodigital/js-fetcher?branch=master)
+[![npm version](https://badge.fury.io/js/%40docomodigital%2Fjs-fetcher.svg)](https://badge.fury.io/js/%40docomodigital%2Fjs-fetcher)
+[![Greenkeeper badge](https://badges.greenkeeper.io/docomodigital/js-fetcher.svg)](https://greenkeeper.io/)
+
+A simple fetcher class to better [window.fetch](https://developer.mozilla.org/it/docs/Web/API/Fetch_API) interface
 
 ## Usage
 ```javascript
@@ -14,6 +19,7 @@ const fetcher = new Fetcher({
         }
     }
 })
+
  // set an Authorization header for all requests
  fetcher.get('/v01/users').then(res => res.json());
  fetcher.post('/v01/user', {}, { credentials: 'include', body: JSON.stringify({foo: 'bar'}) });
