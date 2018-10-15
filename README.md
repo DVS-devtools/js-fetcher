@@ -20,7 +20,6 @@ const fetcher = new Fetcher({
     }
 })
 
- // set an Authorization header for all requests
  fetcher.get('/v01/users').then(res => res.json());
  fetcher.post('/v01/user', {}, { credentials: 'include', body: JSON.stringify({foo: 'bar'}) });
  
