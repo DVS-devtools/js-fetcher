@@ -556,6 +556,7 @@ function () {
       }
     }
     /**
+     * @ignore
      * @description add the baseUrl if the passed url is not absolute
      * @param {any} url
      * @return {String}
@@ -571,6 +572,7 @@ function () {
       return (0, _index.isAbsoluteUrl)(url) ? url : this.baseURL + url;
     }
     /**
+     * @ignore
      * @description called by the Fetcher Api,
      * perform the real fetch request based on the given arguments.
      * Avoid to use it directly to prevent unexpected behaviour
@@ -709,6 +711,7 @@ function () {
       return this.performFetch(url, params, options, 'DELETE', parse);
     }
     /**
+     * @ignore
      * @description Call the TokenGenerator (if present) to get the Authorization token
      * and set it in the Headers
      * @return {*}

@@ -15,9 +15,18 @@ const fetcher = new Fetcher({
     }
 })
  // set an Authorization header for all requests
- fetcher.options.headers['Authorization'] = 'Bearer <TOKEN>';
  fetcher.get('/v01/users').then(res => res.json());
  fetcher.post('/v01/user', {}, { credentials: 'include', body: JSON.stringify({foo: 'bar'}) });
+ 
+ // Using the token generator:
+ const generator = new TokenGenerator({
+    url: 'http://api.com/oauth/token',
+    clientId: 123,
+    clientSecret: 'secret123456789'
+ });
+ fetcher.setTokenGenerator(generator);
+ // Now, before every fetch requests, the library will check if the current Bearer token (if present) is valid and will try to get a new one if necessary.
+ // The new token will be used as Authentication: Bearer <Token> header
 ```
 
 
