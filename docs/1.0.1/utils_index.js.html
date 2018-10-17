@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>TokenGenerator/index.js - Documentation</title>
+    <title>utils/index.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">TokenGenerator/index.js</h1>
+    <h1 class="page-title">utils/index.js</h1>
     
 
     
@@ -39,97 +39,50 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @description Class to manage the Authorization token
- * Check if the current one is still valid and fetch a new one if necessary
- * @example
- * const generator = new TokenGenerator({
- *     url: 'http://api.com/auth/refresh',
- *     clientId: 22,
- *     clientSecret: 'secret',
- * })
- * generator.refreshToken()
- *     .then(token => {
- *         // token is a valid token
- *     })
+            <pre class="prettyprint source linenums"><code>import URLSearchParams from 'url-search-params';
+
+/**
+ * @description Parse the fetch response (call the response json function)
+ * @param {Object} res
+ * @return {Promise&lt;any>}
  */
-class TokenGenerator {
-    /**
-     * @description Creates an instance of TokenGenerator.
-     * @param {Object} [options = {}]
-     * @param {String} [options.url = window.location.origin] The url to call to fetch a new token
-     * @param {String | number} [options.clientId] client id to request a new token
-     * @param {String} [options.clientSecret] client secret to request a new token
-     */
-    constructor({ url = window.location.origin, clientId, clientSecret } = {}) {
-        this.currentCall = null;
-        this.expire = Date.now() - 1000;
-        this.token = null;
-        this.url = url;
-        Object.defineProperty(this, 'clientId', {
-            value: clientId,
-            writable: false,
-            enumerable: false,
-            configurable: false
-        });
-
-        Object.defineProperty(this, 'clientSecret', {
-            value: clientSecret,
-            writable: false,
-            enumerable: false,
-            configurable: false
-        });
-        this.isExpired = this.isExpired.bind(this);
-    }
-
-    /**
-     * @description Check if the stored token is expired
-     * @return {boolean}
-     */
-    isExpired() {
-        return Date.now() >= this.expire;
-    }
-
-    /**
-     * @description Generate a new token if the current one is expired, else uses it
-     * @return {PromiseLike&lt;T | never> | Promise&lt;T>}
-     * @example
-     * generator.generate()
-     *    .then(token => {
-     *        // token is a valid token
-     *    })
-     */
-    generate() {
-        if (this.isExpired()) {
-            if (this.currentCall) { return this.currentCall; }
-            this.currentCall = fetch(this.url, {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'content-type': 'application/x-www-form-urlencoded' },
-                body: `k=${this.clientId}&amp;s=${this.clientSecret}`
-                // body: JSON.stringify( { k: this.clientId, s: this.clientSecret })
-            })
-                .then(resp => resp.json())
-                .then((resp) => {
-                    if (resp.token) {
-                        this.currentCall = null;
-                        this.token = resp.token;
-                        this.expire = resp.expire;
-                        return this.token;
-                    }
-                    return null;
-                })
-                .catch((e) => {
-                    this.currentCall = null;
-                    throw e;
-                });
-            return this.currentCall;
-        }
-        return Promise.resolve(this.token);
-    }
+export function parseResponse(res) {
+    return res.json();
 }
 
-export default TokenGenerator;
+/**
+ * @description Check if the given string is an absolute url (starts with http(s))
+ * @param {String} str
+ * @return {boolean}
+ * @example
+ * isAbsoluteUrl('http://endpoint.com/api/users') // true
+ * isAbsoluteUrl('/api/users') // false
+ */
+export function isAbsoluteUrl(str) {
+    const regex = /(https?)?:?\/\//g;
+    return regex.test(str);
+}
+
+/**
+ * @description Append the given query params object to the given url as queryparams
+ * @param {string} url
+ * @param {Object} queryParams
+ * @return {String}
+ * @example
+ * compose('http://endpoint.com/api/users', {page: 1, limit: 10}); // http://endpoint.com/api/users?page=1&amp;limit=10
+ */
+export function compose(url, queryParams) {
+    const splittedUrl = url.split('?');
+    const endpoint = splittedUrl[0];
+    const params = splittedUrl.length > 0 ? splittedUrl[1] : '';
+    const urlSearchParams = new URLSearchParams(params);
+
+    Object.keys(queryParams).forEach((key) => {
+        urlSearchParams.set(key, queryParams[key]);
+    });
+
+    return `${endpoint}?${urlSearchParams.toString()}`;
+}
 </code></pre>
         </article>
     </section>
@@ -142,7 +95,7 @@ export default TokenGenerator;
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 17 2018 12:15:48 GMT+0200 (CEST) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 17 2018 12:15:47 GMT+0200 (CEST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
